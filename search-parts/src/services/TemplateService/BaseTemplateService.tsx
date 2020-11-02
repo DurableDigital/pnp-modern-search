@@ -408,33 +408,31 @@ abstract class BaseTemplateService {
             return ret;
         });
 
+
         // Sort array by CreatedDate in descending order, get the top n values, randomize them then return a set of n unique values
-        // <p>{{randomize items 15 5}}</p>
-        Handlebars.registerHelper('randomize', (array: any[], firstSlice: number, secondSlice) => {
+        // <p>{{randomizeByCreatedDate items 15 5}}</p>
+        Handlebars.registerHelper('randomizeByCreatedDate', (array: any[], sortedItemsCount : number, randomItemsCount: number) => {
 
-            var newArray = [];
-            var sortedDates = [];
+            // sort array by created date in descending order
+            // https://stackoverflow.com/questions/50452458/sorting-date-mm-dd-yyyy-field-from-an-array-of-arrays
+            let sortedDates = array.sort(function (b, a) { return new Date(a.CreatedDate).getTime() - new Date(b.CreatedDate).getTime(); });
             
-            sortedDates = array.sort((b, a) =>
-            a.CreatedDate.split('/').reverse().join().localeCompare(b.CreatedDate.split('/').reverse().join())); 
-            let mostRecent = sortedDates.slice(0, firstSlice);
-            
-            //console.log("mostRecent");
-            //console.log(mostRecent);
+            // get the top X results from the sorted array
+            let mostRecent = sortedDates.slice(0, sortedItemsCount);
+                
+            // shuffle the X newest results
+            // https://javascript.info/task/shuffle
+            for (let i = sortedItemsCount - 1; i > 0; i--) {
+                  let j = Math.floor(Math.random() * (i + 1));
+                  [mostRecent[i], mostRecent[j]] = [mostRecent[j], mostRecent[i]];
+                }
 
-            for (var i = 0; i < mostRecent.length; ++i)
-            {
-                    var random = mostRecent[Math.floor(Math.random() * mostRecent .length)];
-                    newArray.push(random);    
-            }
-
-            var uniqueArray = Array.from(new Set(newArray));
-            //console.log("uniqueArray");
-            //console.log(uniqueArray);
-
-            return uniqueArray.slice(0, secondSlice);
+            // Return a selection of X records from the randomised array
+            return mostRecent.slice(0, randomItemsCount);
 
           });
+
+
         // Group by a specific property
         Handlebars.registerHelper(groupBy(Handlebars));
     }
