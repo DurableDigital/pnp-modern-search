@@ -23,6 +23,8 @@ import groupBy from 'handlebars-group-by';
 import { Loader } from './LoadHelper';
 import { IComponentDefinition } from '../ExtensibilityService/IComponentDefinition';
 import { UrlHelper } from '../../helpers/UrlHelper';
+import * as $ from 'jquery';
+
 
 abstract class BaseTemplateService {
 
@@ -409,28 +411,24 @@ abstract class BaseTemplateService {
         });
 
 
-        // Sort array by CreatedDate in descending order, get the top n values, randomize them then return a set of n unique values
-        // <p>{{randomizeByCreatedDate items 15 5}}</p>
-        Handlebars.registerHelper('randomizeByCreatedDate', (array: any[], sortedItemsCount : number, randomItemsCount: number) => {
+        // Sort array by CreatedDate in descending order and get the top n values
+        // <p>{{showHideSortedByCreatedDate items 10}}</p>
+        Handlebars.registerHelper('showHideSortedByCreatedDate', (array: any[], sortedItemsCount : number) => {
 
             // sort array by created date in descending order
             // https://stackoverflow.com/questions/50452458/sorting-date-mm-dd-yyyy-field-from-an-array-of-arrays
             let sortedDates = array.sort(function (b, a) { return new Date(a.CreatedDate).getTime() - new Date(b.CreatedDate).getTime(); });
-            
-            // get the top X results from the sorted array
-            let mostRecent = sortedDates.slice(0, sortedItemsCount);
-                
-            // shuffle the X newest results
-            // https://javascript.info/task/shuffle
-            for (let i = sortedItemsCount - 1; i > 0; i--) {
-                  let j = Math.floor(Math.random() * (i + 1));
-                  [mostRecent[i], mostRecent[j]] = [mostRecent[j], mostRecent[i]];
-                }
+                 
+            // if #showmore is clicked, remove hidden class to display additional results and hide showmore link
+            $("body").on("click", "#showmore", function() { 
+                $('div.ms-Grid-col.hide-listings').removeClass('hide-listings');
+                $('#showmore').hide();
+            });
 
-            // Return a selection of X records from the randomised array
-            return mostRecent.slice(0, randomItemsCount);
+            return sortedDates.slice(0, sortedItemsCount);      
 
           });
+                  
 
 
         // Group by a specific property
