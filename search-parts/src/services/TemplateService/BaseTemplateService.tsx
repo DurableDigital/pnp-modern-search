@@ -418,18 +418,12 @@ abstract class BaseTemplateService {
             // sort array by created date in descending order
             // https://stackoverflow.com/questions/50452458/sorting-date-mm-dd-yyyy-field-from-an-array-of-arrays
             let sortedDates = array.sort(function (b, a) { return new Date(a.CreatedDate).getTime() - new Date(b.CreatedDate).getTime(); });
-                 
-            // if #showmore is clicked, remove hidden class to display additional results and hide showmore link
-            $("body").on("click", "#showmore", function() { 
-                $('div.ms-Grid-col.hide-listings').removeClass('hide-listings');
-                $('#showmore').hide();
-            });
-
+                         
             return sortedDates.slice(0, sortedItemsCount);      
 
           });
+       
                   
-
 
         // Group by a specific property
         Handlebars.registerHelper(groupBy(Handlebars));
